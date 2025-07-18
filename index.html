@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SOLEPAY MVP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: url('https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=1350&q=80') no-repeat center center fixed;
+      background-size: cover;
+      color: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      padding: 30px 20px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    }
+    .logo {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1e1e1e;
+      margin-bottom: 15px;
+    }
+    h1 {
+      font-size: 20px;
+      font-weight: 500;
+      margin-bottom: 20px;
+    }
+    select, label, input[type="checkbox"] {
+      font-size: 16px;
+    }
+    select {
+      padding: 12px;
+      margin-bottom: 20px;
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    .toggle {
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .step-score {
+      font-size: 14px;
+      margin-top: 20px;
+      color: #666;
+    }
+    .goal-unlocked {
+      color: #00c46a;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+    button {
+      padding: 14px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      background-color: #00c46a;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0, 196, 106, 0.5);
+      transition: all 0.3s ease;
+      animation: pulse 1.5s infinite;
+    }
+    button:hover {
+      background-color: #00a75a;
+    }
+    .message {
+      margin-top: 20px;
+      font-size: 16px;
+      line-height: 1.6;
+      color: #333;
+    }
+    .badge {
+      margin-top: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      background-color: #f2f2f2;
+      padding: 6px 14px;
+      border-radius: 20px;
+      display: inline-block;
+    }
+    .achievement {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #00a75a;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 10px rgba(0, 196, 106, 0.4); }
+      50% { box-shadow: 0 0 20px rgba(0, 196, 106, 0.7); }
+      100% { box-shadow: 0 0 10px rgba(0, 196, 106, 0.4); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">SOLEPAY</div>
+    <h1>👟 Step to Pay</h1>
+
+    <select id="wallet">
+      <option value="Touch 'n Go eWallet">Touch 'n Go eWallet</option>
+      <option value="GrabPay">GrabPay</option>
+      <option value="Boost">Boost</option>
+    </select>
+
+    <div class="toggle">
+      <input type="checkbox" id="donate" />
+      <label for="donate">Round up RM0.35 to support ocean cleanup 🌊</label>
+    </div>
+
+    <button onclick="makePayment()">Step Here</button>
+    <div class="message" id="status"></div>
+    <div class="step-score" id="stepScore"></div>
+    <div class="achievement" id="badgeDisplay"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <script>
+    let steps = 0;
+    let stepGoal = 1000;
+    let badges = [];
+
+    function updateStepScore() {
+      const stepDisplay = document.getElementById("stepScore");
+      const badgeDisplay = document.getElementById("badgeDisplay");
+      stepDisplay.innerHTML = `🚶‍♀️ Steps Taken: ${steps} / ${stepGoal}`;
+
+      if (steps >= stepGoal && !badges.includes("Eco Streak")) {
+        badges.push("Eco Streak");
+        badgeDisplay.innerHTML += `<div class='badge'>🏅 Eco Streak: 1000 Steps</div>`;
+      }
+
+      if (steps >= 2000 && !badges.includes("Green Champion")) {
+        badges.push("Green Champion");
+        badgeDisplay.innerHTML += `<div class='badge'>🏅 Green Champion: 2000 Steps</div>`;
+      }
+    }
+
+    function makePayment() {
+      const status = document.getElementById("status");
+      const wallet = document.getElementById("wallet").value;
+      const donate = document.getElementById("donate").checked;
+      const today = new Date();
+      const ref = "TXN-" + today.getFullYear()
+                   + String(today.getMonth() + 1).padStart(2, '0')
+                   + String(today.getDate()).padStart(2, '0')
+                   + "-" + Math.floor(1000 + Math.random() * 9000);
+
+      steps += 250;
+      updateStepScore();
+
+      status.innerHTML = "🔄 Connecting to SOLENET...";
+
+      setTimeout(() => {
+        status.innerHTML = `🚀 Routing via ${wallet}...`;
+
+        setTimeout(() => {
+          let msg = `
+            ✅ Payment of RM15 completed!<br>
+            🪙 Paid from: ${wallet}<br>
+            📎 Ref: ${ref}<br><br>
+            🌱 <strong>Estimated Carbon Impact:</strong> 0.6kg CO₂<br>
+            💚 <strong>Supports:</strong> Local reforestation<br>
+          `;
+
+          if (donate) {
+            msg += `🎁 <strong>RM0.35 donated to ocean cleanup initiative 🌊</strong><br>`;
+          }
+
+          msg += `<div class="badge">🌟 Impact Level: Everyday Eco Hero</div>`;
+          status.innerHTML = msg;
+
+          confetti({
+            particleCount: 150,
+            spread: 100,
+            origin: { y: 0.6 }
+          });
+
+        }, 1500);
+      }, 1500);
+    }
+
+    updateStepScore();
+  </script>
+</body>
+</html>
