@@ -29,7 +29,7 @@ SOLEPAY is a frictionless, hands-free payment prototype that turns your **steps 
 
 ---
 
-## 🧭 Use Case Alignment: Hackathon Theme
+## 🧭 Use Case Alignment
 
 **Challenge**:  
 _"How can digital payment be leveraged to seamlessly integrate environmental sustainability and social impact into daily transactions?"_
@@ -45,9 +45,9 @@ _"How can digital payment be leveraged to seamlessly integrate environmental sus
 ## 🚀 Try It Out
 
 Visit the live MVP here:  
-👉 [YOUR GITHUB PAGES LINK] (replace this with the real URL once deployed)
+👉 https://voxyxgems.github.io/SOLEPAY-MVP/ 
 
-Tap the “Step Here” button to simulate a payment. Each tap boosts your sustainability progress!
+Tap the “Step Here” button to simulate a payment. Each tap boosts your sustainability progress! Keep the eco streak! 🔥
 
 ---
 
