@@ -1,143 +1,204 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SOLEPAY - Sustainable Steps</title>
+  <meta charset="UTF-8">
+  <title>SOLEPAY MVP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700&display=swap" rel="stylesheet">
   <style>
-    body {
+    * {
+      box-sizing: border-box;
+    }
+    html, body {
+      height: 100%;
       margin: 0;
-      font-family: "Segoe UI", sans-serif;
+      font-family: 'Inter', sans-serif;
       background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
       background-size: cover;
+      color: #333;
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 100vh;
-      color: #fff;
     }
-
     .container {
-      background: rgba(255, 255, 255, 0.85);
-      color: #333;
-      padding: 2rem;
-      border-radius: 16px;
-      width: 90%;
       max-width: 400px;
+      width: 90%;
       text-align: center;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      padding: 30px 20px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
     }
-
+    .logo {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1e1e1e;
+      margin-bottom: 15px;
+    }
     h1 {
-      margin-bottom: 10px;
-      font-size: 1.5rem;
-      color: #4B5563;
+      font-size: 20px;
+      font-weight: 500;
+      margin-bottom: 20px;
     }
-
+    select, label, input[type="checkbox"] {
+      font-size: 16px;
+    }
+    select {
+      padding: 12px;
+      margin-bottom: 20px;
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    .toggle {
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .step-score {
+      font-size: 14px;
+      margin-top: 20px;
+      color: #666;
+    }
+    .goal-unlocked {
+      color: #00c46a;
+      font-weight: bold;
+      margin-top: 5px;
+    }
     button {
-      background-color: #8e7cc3;
+      padding: 14px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      background-color: #00c46a;
       color: white;
       border: none;
-      padding: 0.75rem 1.5rem;
-      border-radius: 10px;
-      font-size: 1rem;
+      border-radius: 50px;
       cursor: pointer;
-      margin-top: 1rem;
+      box-shadow: 0 0 10px rgba(0, 196, 106, 0.5);
+      transition: all 0.3s ease;
+      animation: pulse 1.5s infinite;
     }
-
-    #ref {
-      margin-top: 1rem;
-      font-weight: bold;
-      color: #2563eb;
+    button:hover {
+      background-color: #00a75a;
     }
-
-    #stepCount {
-      font-size: 1.2rem;
-      margin: 1rem 0;
-      color: #111827;
+    .message {
+      margin-top: 20px;
+      font-size: 16px;
+      line-height: 1.6;
+      color: #333;
     }
-
     .badge {
-      margin-top: 1rem;
-      font-size: 1.5rem;
+      margin-top: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      background-color: #f2f2f2;
+      padding: 6px 14px;
+      border-radius: 20px;
+      display: inline-block;
     }
-
-    .confetti {
-      position: fixed;
-      width: 100%;
-      height: 100%;
-      z-index: 1000;
-      pointer-events: none;
+    .achievement {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #00a75a;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 10px rgba(0, 196, 106, 0.4); }
+      50% { box-shadow: 0 0 20px rgba(0, 196, 106, 0.7); }
+      100% { box-shadow: 0 0 10px rgba(0, 196, 106, 0.4); }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>🌱 SOLEPAY: Step to Pay</h1>
-    <p id="stepCount">Steps: 0 / 1000</p>
-    <button onclick="pay()">Step Here to Pay</button>
-    <p id="ref"></p>
-    <div id="badge" class="badge"></div>
+    <div class="logo">SOLEPAY</div>
+    <h1>👟 Step to Pay</h1>
+
+    <select id="wallet">
+      <option value="Touch 'n Go eWallet">Touch 'n Go eWallet</option>
+      <option value="GrabPay">GrabPay</option>
+      <option value="Boost">Boost</option>
+    </select>
+
+    <div class="toggle">
+      <input type="checkbox" id="donate" />
+      <label for="donate">Round up RM0.35 to support ocean cleanup 🌊</label>
+    </div>
+
+    <button onclick="makePayment()">Step Here</button>
+    <div class="message" id="status"></div>
+    <div class="step-score" id="stepScore"></div>
+    <div class="achievement" id="badgeDisplay"></div>
   </div>
 
-  <canvas id="confetti" class="confetti"></canvas>
-
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
   <script>
     let steps = 0;
+    let stepGoal = 1000;
+    let badges = [];
 
-    function pay() {
-      steps += Math.floor(Math.random() * 200 + 100);
-      document.getElementById("stepCount").textContent = `Steps: ${steps} / 1000`;
+    function updateStepScore() {
+      const stepDisplay = document.getElementById("stepScore");
+      const badgeDisplay = document.getElementById("badgeDisplay");
+      stepDisplay.innerHTML = `🚶‍♀️ Steps Taken: ${steps} / ${stepGoal}`;
 
-      const ref = "SP" + Math.floor(Math.random() * 900000 + 100000);
-      document.getElementById("ref").textContent = `Transaction Ref: ${ref}`;
+      if (steps >= stepGoal && !badges.includes("Eco Streak")) {
+        badges.push("Eco Streak");
+        badgeDisplay.innerHTML += `<div class='badge'>🏅 Eco Streak: 1000 Steps</div>`;
+      }
 
-      if (steps >= 1000) {
-        document.getElementById("badge").textContent = "🏅 Eco Warrior Badge Unlocked!";
-        launchConfetti();
+      if (steps >= 2000 && !badges.includes("Green Champion")) {
+        badges.push("Green Champion");
+        badgeDisplay.innerHTML += `<div class='badge'>🏅 Green Champion: 2000 Steps</div>`;
       }
     }
 
-    function launchConfetti() {
-      const canvas = document.getElementById('confetti');
-      const ctx = canvas.getContext('2d');
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+    function makePayment() {
+      const status = document.getElementById("status");
+      const wallet = document.getElementById("wallet").value;
+      const donate = document.getElementById("donate").checked;
+      const today = new Date();
+      const ref = "TXN-" + today.getFullYear()
+                   + String(today.getMonth() + 1).padStart(2, '0')
+                   + String(today.getDate()).padStart(2, '0')
+                   + "-" + Math.floor(1000 + Math.random() * 9000);
 
-      const confettiCount = 300;
-      const confetti = [];
+      steps += 250;
+      updateStepScore();
 
-      for (let i = 0; i < confettiCount; i++) {
-        confetti.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height - canvas.height,
-          r: Math.random() * 6 + 2,
-          d: Math.random() * confettiCount,
-          color: `hsl(${Math.random() * 360}, 70%, 60%)`,
-          tilt: Math.floor(Math.random() * 10) - 5,
-          tiltAngleIncremental: Math.random() * 0.07 + 0.05,
-          tiltAngle: 0
-        });
-      }
+      status.innerHTML = "🔄 Connecting to SOLENET...";
 
-      function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        confetti.forEach((c, i) => {
-          c.tiltAngle += c.tiltAngleIncremental;
-          c.y += (Math.cos(c.d) + 3 + c.r / 2) / 2;
-          c.tilt = Math.sin(c.tiltAngle - i / 3) * 15;
+      setTimeout(() => {
+        status.innerHTML = `🚀 Routing via ${wallet}...`;
 
-          ctx.beginPath();
-          ctx.lineWidth = c.r;
-          ctx.strokeStyle = c.color;
-          ctx.moveTo(c.x + c.tilt + c.r / 2, c.y);
-          ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.r / 2);
-          ctx.stroke();
-        });
-        requestAnimationFrame(draw);
-      }
-      draw();
+        setTimeout(() => {
+          let msg = `
+            ✅ Payment of RM15 completed!<br>
+            🪙 Paid from: ${wallet}<br>
+            📎 Ref: ${ref}<br><br>
+            🌱 <strong>Estimated Carbon Impact:</strong> 0.6kg CO₂<br>
+            💚 <strong>Supports:</strong> Local reforestation<br>
+          `;
+
+          if (donate) {
+            msg += `🎁 <strong>RM0.35 donated to ocean cleanup initiative 🌊</strong><br>`;
+          }
+
+          msg += `<div class="badge">🌟 Impact Level: Everyday Eco Hero</div>`;
+          status.innerHTML = msg;
+
+          confetti({
+            particleCount: 150,
+            spread: 100,
+            origin: { y: 0.6 }
+          });
+
+        }, 1500);
+      }, 1500);
     }
+
+    updateStepScore();
   </script>
 </body>
 </html>
